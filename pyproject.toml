@@ -23,6 +23,12 @@ dev = [
     "taskipy>=1.14.1",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = '-p no:warnings'
+asyncio_default_fixture_loop_scope = 'function'
+DJANGO_SETTINGS_MODULE = "weather_alert.settings"
+
 [tool.isort]
 profile = "black"
 line_length = 88
@@ -38,3 +44,4 @@ skip_gitignore = true
 [tool.taskipy.tasks]
 format = "isort . && blue ."
 run = "uvicorn weather_alert.asgi:application --host 0.0.0.0 --port 8000 --reload"
+test = 'pytest -x -vv'
