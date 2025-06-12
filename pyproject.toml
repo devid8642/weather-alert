@@ -1,0 +1,22 @@
+[project]
+name = "weather-alert"
+version = "0.1.0"
+description = "O WeatherAlert é um sistema de monitoramento de temperatura de localidades."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2.3",
+    "django-ninja>=1.4.3",
+    "httpx[http2]>=0.28.1",
+    "python-decouple>=3.8",
+    "uvicorn[standard]>=0.34.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "pytest-django>=4.11.1",
+    "respx>=0.22.0",
+    "taskipy>=1.14.1",
+]

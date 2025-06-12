@@ -1,0 +1,1 @@
+O WeatherAlert é um sistema de monitoramento de temperatura de localidades.
