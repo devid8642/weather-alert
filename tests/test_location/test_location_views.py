@@ -27,7 +27,9 @@ async def test_create_location(
 
 @pytest.mark.asyncio
 @pytest.mark.django_db
-async def test_list_locations(api_client: TestAsyncClient, create_location_data):
+async def test_list_locations(
+    api_client: TestAsyncClient, create_location_data
+):
     await Location.objects.acreate(**create_location_data)
 
     response = await api_client.get('locations/')
@@ -54,7 +56,9 @@ async def test_get_location(api_client: TestAsyncClient, create_location_data):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db
-async def test_delete_location(api_client: TestAsyncClient, create_location_data):
+async def test_delete_location(
+    api_client: TestAsyncClient, create_location_data
+):
     location = await Location.objects.acreate(**create_location_data)
 
     response = await api_client.delete(f'locations/{location.id}/')

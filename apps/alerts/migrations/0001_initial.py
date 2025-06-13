@@ -16,21 +16,51 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Alert',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('temperature', models.FloatField()),
                 ('threshold', models.FloatField()),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('notified', models.BooleanField(default=False)),
-                ('location', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='alerts', to='location.location')),
+                (
+                    'location',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='alerts',
+                        to='location.location',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='AlertConfig',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('temperature_threshold', models.FloatField()),
                 ('check_interval_minutes', models.IntegerField(default=30)),
-                ('location', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='alert_config', to='location.location')),
+                (
+                    'location',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='alert_config',
+                        to='location.location',
+                    ),
+                ),
             ],
         ),
     ]
