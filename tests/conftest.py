@@ -6,7 +6,7 @@ from ninja.testing import TestAsyncClient
 from apps.location.models import Location
 from apps.alerts.models import Alert, AlertConfig
 
-from apps.api.app import api
+from weather_alert.api.app import api
 
 
 def pytest_generate_tests(metafunc):
