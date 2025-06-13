@@ -1,9 +1,10 @@
 from django.db import models
+
 from apps.location.models import Location
 
 
 class AlertConfig(models.Model):
-    location = models.OneToOneField(
+    location = models.ForeignKey(
         Location, on_delete=models.CASCADE, related_name='alert_config'
     )
     temperature_threshold = models.FloatField()
@@ -23,4 +24,4 @@ class Alert(models.Model):
     notified = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"ALERT: {self.location.name} - {self.temperature}°C"
+        return f'ALERT: {self.location.name} - {self.temperature}°C'
