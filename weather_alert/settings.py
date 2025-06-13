@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.location',
     'apps.alerts',
+    'apps.temperature',
 ]
 
 MIDDLEWARE = [
