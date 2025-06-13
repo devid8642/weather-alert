@@ -6,6 +6,7 @@ from ninja.testing import TestAsyncClient
 
 from apps.alerts.models import Alert, AlertConfig
 from apps.location.models import Location
+from apps.temperature.models import TemperatureLog
 from weather_alert.api.app import api
 
 
@@ -46,3 +47,16 @@ async def create_alert(create_location):
         notified=False,
     )
     return alert
+
+
+@pytest_asyncio.fixture
+async def create_temperature_log(create_location):
+    temperature_log = await TemperatureLog.objects.acreate(
+        location=create_location, temperature=28.5
+    )
+    return temperature_log
+
+
+@pytest.fixture
+def create_temperature_log_data(create_location):
+    return {'location': create_location, 'temperature': 28.5}
