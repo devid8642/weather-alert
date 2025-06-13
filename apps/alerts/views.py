@@ -1,13 +1,14 @@
 from ninja import Router
 
-from weather_alert.api.schemas import MessageSchema
-from .models import AlertConfig, Alert
 from apps.location.models import Location
+from weather_alert.api.schemas import MessageSchema
+
+from .models import Alert, AlertConfig
 from .schemas import (
     AlertConfigSchema,
+    AlertSchema,
     CreateAlertConfigSchema,
     UpdateAlertConfigSchema,
-    AlertSchema
 )
 
 alert_config_router = Router(tags=['Alert Configs'])
@@ -16,7 +17,10 @@ alert_router = Router(tags=['Alerts'])
 
 # Alert Config Endpoints
 
-@alert_config_router.post('/', response={200: AlertConfigSchema, 404: MessageSchema})
+
+@alert_config_router.post(
+    '/', response={200: AlertConfigSchema, 404: MessageSchema}
+)
 async def create_alert_config(request, payload: CreateAlertConfigSchema):
     """
     Cria uma nova configuração de alerta.
@@ -36,7 +40,7 @@ async def create_alert_config(request, payload: CreateAlertConfigSchema):
     alert_config = await AlertConfig.objects.acreate(
         location=location,
         temperature_threshold=payload.temperature_threshold,
-        check_interval_minutes=payload.check_interval_minutes
+        check_interval_minutes=payload.check_interval_minutes,
     )
     return alert_config
 
@@ -54,7 +58,9 @@ async def list_alert_configs(request):
     return alert_configs
 
 
-@alert_config_router.get('/{id}/', response={200: AlertConfigSchema, 404: MessageSchema})
+@alert_config_router.get(
+    '/{id}/', response={200: AlertConfigSchema, 404: MessageSchema}
+)
 async def get_alert_config(request, id: int):
     """
     Recupera uma configuração de alerta pelo seu ID.
@@ -70,11 +76,17 @@ async def get_alert_config(request, id: int):
         config = await AlertConfig.objects.aget(id=id)
         return config
     except AlertConfig.DoesNotExist:
-        return 404, MessageSchema(message='Configuração de alerta não encontrada')
+        return 404, MessageSchema(
+            message='Configuração de alerta não encontrada'
+        )
 
 
-@alert_config_router.put('/{id}/', response={200: AlertConfigSchema, 404: MessageSchema})
-async def update_alert_config(request, id: int, payload: UpdateAlertConfigSchema):
+@alert_config_router.put(
+    '/{id}/', response={200: AlertConfigSchema, 404: MessageSchema}
+)
+async def update_alert_config(
+    request, id: int, payload: UpdateAlertConfigSchema
+):
     """
     Atualiza uma configuração de alerta existente.
 
@@ -89,7 +101,9 @@ async def update_alert_config(request, id: int, payload: UpdateAlertConfigSchema
     try:
         config = await AlertConfig.objects.aget(id=id)
     except AlertConfig.DoesNotExist:
-        return 404, MessageSchema(message='Configuração de alerta não encontrada')
+        return 404, MessageSchema(
+            message='Configuração de alerta não encontrada'
+        )
 
     update_data = payload.model_dump(exclude_unset=True)
 
@@ -117,10 +131,13 @@ async def delete_alert_config(request, id: int):
         await config.adelete()
         return 204, None
     except AlertConfig.DoesNotExist:
-        return 404, MessageSchema(message='Configuração de alerta não encontrada')
+        return 404, MessageSchema(
+            message='Configuração de alerta não encontrada'
+        )
 
 
 # Alert Endpoints
+
 
 @alert_router.get('/', response=list[AlertSchema])
 async def list_alerts(request, location_id: int = None):

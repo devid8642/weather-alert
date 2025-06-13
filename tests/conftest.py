@@ -3,9 +3,9 @@ import os
 import pytest
 import pytest_asyncio
 from ninja.testing import TestAsyncClient
-from apps.location.models import Location
-from apps.alerts.models import Alert, AlertConfig
 
+from apps.alerts.models import Alert, AlertConfig
+from apps.location.models import Location
 from weather_alert.api.app import api
 
 
@@ -22,20 +22,20 @@ def api_client():
 @pytest_asyncio.fixture
 async def create_location():
     location = await Location.objects.acreate(
-        name='Recife Antigo',
-        latitude=-8.0628,
-        longitude=-34.8711
+        name='Recife Antigo', latitude=-8.0628, longitude=-34.8711
     )
     return location
+
 
 @pytest_asyncio.fixture
 async def create_alert_config(create_location):
     alert_config = await AlertConfig.objects.acreate(
         location=create_location,
         temperature_threshold=30.5,
-        check_interval_minutes=15
+        check_interval_minutes=15,
     )
     return alert_config
+
 
 @pytest_asyncio.fixture
 async def create_alert(create_location):
@@ -43,6 +43,6 @@ async def create_alert(create_location):
         location=create_location,
         temperature=35.0,
         threshold=30.5,
-        notified=False
+        notified=False,
     )
     return alert

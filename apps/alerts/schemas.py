@@ -1,7 +1,10 @@
-from ninja import Field, ModelSchema, Schema
 from typing import Optional
-from .models import AlertConfig, Alert
+
+from ninja import Field, ModelSchema, Schema
+
 from apps.location.models import Location
+
+from .models import Alert, AlertConfig
 
 
 class AlertConfigSchema(ModelSchema):
@@ -14,9 +17,15 @@ class AlertConfigSchema(ModelSchema):
         temperature_threshold (float): Limite de temperatura para disparo do alerta.
         check_interval_minutes (int): Intervalo em minutos para verificação da temperatura.
     """
+
     class Meta:
         model = AlertConfig
-        fields = ['id', 'location', 'temperature_threshold', 'check_interval_minutes']
+        fields = [
+            'id',
+            'location',
+            'temperature_threshold',
+            'check_interval_minutes',
+        ]
 
 
 class CreateAlertConfigSchema(Schema):
@@ -28,6 +37,7 @@ class CreateAlertConfigSchema(Schema):
         temperature_threshold (float): Limite de temperatura para disparo do alerta.
         check_interval_minutes (int): Intervalo em minutos para verificação da temperatura.
     """
+
     location: int
     temperature_threshold: float
     check_interval_minutes: int = 30
@@ -41,6 +51,7 @@ class UpdateAlertConfigSchema(Schema):
         temperature_threshold (Optional[float]): Novo limite de temperatura para disparo do alerta.
         check_interval_minutes (Optional[int]): Novo intervalo em minutos para verificação da temperatura.
     """
+
     temperature_threshold: Optional[float] = None
     check_interval_minutes: Optional[int] = None
 
@@ -57,6 +68,14 @@ class AlertSchema(ModelSchema):
         timestamp (datetime): Data e hora em que o alerta foi registrado.
         notified (bool): Indica se a notificação do alerta foi enviada.
     """
+
     class Meta:
         model = Alert
-        fields = ['id', 'location', 'temperature', 'threshold', 'timestamp', 'notified']
+        fields = [
+            'id',
+            'location',
+            'temperature',
+            'threshold',
+            'timestamp',
+            'notified',
+        ]

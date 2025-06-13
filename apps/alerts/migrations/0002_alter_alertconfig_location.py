@@ -15,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='alertconfig',
             name='location',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='alert_config', to='location.location'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='alert_config',
+                to='location.location',
+            ),
         ),
     ]
