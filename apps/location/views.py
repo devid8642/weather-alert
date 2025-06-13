@@ -24,14 +24,15 @@ async def create_location(request, payload: CreateLocationSchema):
 
 
 @location_router.get('/', response=list[LocationSchema])
-def list_locations(request):
+async def list_locations(request):
     """
     Lista todas as localizações cadastradas.
 
     Returns:
         list[LocationSchema]: Lista de localizações.
     """
-    locations = Location.objects.all()
+    queryset = Location.objects.all()
+    locations = [location async for location in queryset]
     return locations
 
 
