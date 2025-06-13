@@ -42,14 +42,16 @@ async def create_alert_config(request, payload: CreateAlertConfigSchema):
 
 
 @alert_config_router.get('/', response=list[AlertConfigSchema])
-def list_alert_configs(request):
+async def list_alert_configs(request):
     """
     Lista todas as configurações de alerta cadastradas.
 
     Returns:
         list[AlertConfigSchema]: Lista de configurações de alerta.
     """
-    return AlertConfig.objects.all()
+    queryset = AlertConfig.objects.all()
+    alert_configs = [config async for config in queryset]
+    return alert_configs
 
 
 @alert_config_router.get('/{id}/', response={200: AlertConfigSchema, 404: MessageSchema})
@@ -121,7 +123,7 @@ async def delete_alert_config(request, id: int):
 # Alert Endpoints
 
 @alert_router.get('/', response=list[AlertSchema])
-def list_alerts(request, location_id: int = None):
+async def list_alerts(request, location_id: int = None):
     """
     Lista todos os alertas, podendo ser filtrados por localidade.
 
@@ -132,9 +134,11 @@ def list_alerts(request, location_id: int = None):
         list[AlertSchema]: Lista de alertas.
     """
     if location_id:
-        alerts = Alert.objects.filter(location_id=location_id)
+        queryset = Alert.objects.filter(location_id=location_id)
     else:
-        alerts = Alert.objects.all()
+        queryset = Alert.objects.all()
+
+    alerts = [alert async for alert in queryset]
     return alerts
 
 
