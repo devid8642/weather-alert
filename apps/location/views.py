@@ -31,8 +31,7 @@ def list_locations(request):
     Returns:
         list[LocationSchema]: Lista de localizações.
     """
-    locations = Location.objects.all()
-    return locations
+    return Location.objects.all()
 
 
 @location_router.get(
