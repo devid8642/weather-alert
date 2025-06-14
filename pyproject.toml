@@ -6,9 +6,12 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "django>=5.2.3",
+    "django-celery-beat>=2.8.1",
     "django-ninja>=1.4.3",
     "httpx[http2]>=0.28.1",
     "python-decouple>=3.8",
+    "redis[hiredis]>=6.2.0",
+    "stamina>=25.1.0",
     "uvicorn[standard]>=0.34.3",
 ]
 
@@ -44,4 +47,6 @@ skip_gitignore = true
 [tool.taskipy.tasks]
 format = "isort . && blue ."
 run = "uvicorn weather_alert.asgi:application --host 0.0.0.0 --port 8000 --reload"
+celery = "celery -A weather_alert worker --loglevel=info"
+beat = "celery -A weather_alert beat --scheduler django_celery_beat.schedulers:DatabaseScheduler --loglevel=info"
 test = 'pytest -x -vv'
