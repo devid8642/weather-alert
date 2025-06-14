@@ -82,9 +82,9 @@ class AlertConfigService:
                 period=IntervalSchedule.MINUTES,
             )
 
-            periodic_task = await PeriodicTask.objects.select_related('interval').aget(
-                name=f'Check Temperature for Config {alert_config.id}'
-            )
+            periodic_task = await PeriodicTask.objects.select_related(
+                'interval'
+            ).aget(name=f'Check Temperature for Config {alert_config.id}')
             periodic_task.interval = schedule
             periodic_task.args = json.dumps([alert_config.id])
             await periodic_task.asave()
