@@ -1,6 +1,7 @@
 from ninja import Router
 
 from weather_alert.api.schemas import MessageSchema
+from weather_alert.api.security import n8n_header_key
 from weather_alert.apps.location.models import Location
 
 from .models import Alert, AlertConfig
@@ -182,5 +183,33 @@ async def get_alert(request, id: int):
     try:
         alert = await Alert.objects.aget(id=id)
         return alert
+    except Alert.DoesNotExist:
+        return 404, MessageSchema(message='Alerta não encontrado')
+
+
+@alert_router.post(
+    '/notify/{alert_id}/',
+    response={200: MessageSchema, 404: MessageSchema},
+    auth=n8n_header_key,
+)
+async def mark_alert_as_notified(request, alert_id: int):
+    """
+    Marca o alerta como notificado, apenas se a chave de autenticação do N8N for válida.
+
+    Args:
+        alert_id (int): Identificador do alerta a ser marcado como notificado.
+
+    Returns:
+        200: Alerta marcado como notificado com sucesso.
+        404: Se o alerta não existir.
+        401: Se a autenticação falhar
+    """
+    try:
+        alert = await Alert.objects.aget(id=alert_id)
+        alert.notified = True
+        await alert.asave()
+        return 200, MessageSchema(
+            message='Alerta marcado como notificado com sucesso'
+        )
     except Alert.DoesNotExist:
         return 404, MessageSchema(message='Alerta não encontrado')
