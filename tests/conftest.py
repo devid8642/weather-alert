@@ -2,6 +2,7 @@ import os
 
 import pytest
 import pytest_asyncio
+from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from ninja.testing import TestAsyncClient
 
 from weather_alert.api.app import api
@@ -60,3 +61,22 @@ async def create_temperature_log(create_location):
 @pytest.fixture
 def create_temperature_log_data(create_location):
     return {'location': create_location, 'temperature': 28.5}
+
+
+@pytest_asyncio.fixture
+async def create_schedule():
+    schedule = await IntervalSchedule.objects.acreate(
+        every=15, period=IntervalSchedule.MINUTES
+    )
+    return schedule
+
+
+@pytest_asyncio.fixture
+async def create_periodic_task(create_alert_config, create_schedule):
+    task = await PeriodicTask.objects.acreate(
+        interval=create_schedule,
+        name=f'Check Temperature for Config {create_alert_config.id}',
+        task='weather_alert.apps.alerts.tasks.check_temperature',
+        args='[1]',
+    )
+    return task
