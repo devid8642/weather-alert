@@ -21,7 +21,7 @@ def create_alert_and_notify(
     Returns:
         Alert: O alerta criado e notificado.
     """
-    alert = Alert(
+    alert = Alert.objects.create(
         location=location,
         temperature=temperature,
         threshold=alert_config.temperature_threshold,
@@ -31,6 +31,7 @@ def create_alert_and_notify(
         response = httpx.post(
             settings.N8N_WEBHOOK_URL,
             json={
+                'alert_id': alert.id,
                 'location': location.name,
                 'temperature': temperature,
                 'threshold': alert_config.temperature_threshold,
@@ -39,12 +40,9 @@ def create_alert_and_notify(
             headers={'N8N_WEBHOOK_KEY': settings.N8N_WEBHOOK_HEADER_KEY},
         )
         response.raise_for_status()
-        alert.notified = True
     except httpx.HTTPStatusError:
         print('Erro ao fazer requisição para o N8N')
         print(response.status_code)
         print(response.text)
-
-    alert.save()
 
     return alert

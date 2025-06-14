@@ -1,7 +1,8 @@
 import pytest
+from django.conf import settings
 from ninja.testing import TestAsyncClient
 
-from weather_alert.apps.alerts.models import AlertConfig
+from weather_alert.apps.alerts.models import Alert, AlertConfig
 
 
 @pytest.mark.asyncio
@@ -151,3 +152,53 @@ async def test_get_alert(api_client: TestAsyncClient, create_alert):
     response_not_found = await api_client.get('/alerts/99999/')
     assert response_not_found.status_code == 404
     assert response_not_found.json()['message'] == 'Alerta não encontrado'
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_mark_alert_as_notified_success(
+    api_client: TestAsyncClient, create_alert
+):
+    headers = {'N8N_WEBHOOK_KEY': settings.N8N_WEBHOOK_HEADER_KEY}
+
+    response = await api_client.post(
+        f'/alerts/notify/{create_alert.id}/', headers=headers
+    )
+
+    assert response.status_code == 200
+    assert (
+        response.json()['message']
+        == 'Alerta marcado como notificado com sucesso'
+    )
+
+    updated_alert = await Alert.objects.aget(id=create_alert.id)
+    assert updated_alert.notified is True
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_mark_alert_as_notified_invalid_auth(
+    api_client: TestAsyncClient, create_alert
+):
+    headers = {'N8N_WEBHOOK_KEY': 'chave-invalida'}
+
+    response = await api_client.post(
+        f'/alerts/notify/{create_alert.id}/', headers=headers
+    )
+
+    assert response.status_code == 401
+    assert response.json()['detail'] == 'Unauthorized'
+
+    alert = await Alert.objects.aget(id=create_alert.id)
+    assert alert.notified is False
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_mark_alert_as_notified_not_found(api_client: TestAsyncClient):
+    headers = {'N8N_WEBHOOK_KEY': settings.N8N_WEBHOOK_HEADER_KEY}
+
+    response = await api_client.post('/alerts/notify/99999/', headers=headers)
+
+    assert response.status_code == 404
+    assert response.json()['message'] == 'Alerta não encontrado'

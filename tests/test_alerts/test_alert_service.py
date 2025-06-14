@@ -26,7 +26,6 @@ def test_create_alert_and_notify_success(create_location, create_alert_config):
     assert alert.location == create_location
     assert alert.temperature == 35.0
     assert alert.threshold == create_alert_config.temperature_threshold
-    assert alert.notified is True
 
     assert respx.calls.call_count == 1
     request = respx.calls[0].request
@@ -56,6 +55,5 @@ def test_create_alert_and_notify_failure(create_location, create_alert_config):
     assert alert.location == create_location
     assert alert.temperature == 35.0
     assert alert.threshold == create_alert_config.temperature_threshold
-    assert alert.notified is False
 
     assert respx.calls.call_count == 1
