@@ -10,6 +10,7 @@ from .schemas import (
     CreateAlertConfigSchema,
     UpdateAlertConfigSchema,
 )
+from .services.alert_config_service import AlertConfigService
 
 alert_config_router = Router(tags=['Alert Configs'])
 alert_router = Router(tags=['Alerts'])
@@ -37,11 +38,14 @@ async def create_alert_config(request, payload: CreateAlertConfigSchema):
     except Location.DoesNotExist:
         return 404, MessageSchema(message='Localidade não encontrada')
 
-    alert_config = await AlertConfig.objects.acreate(
-        location=location,
-        temperature_threshold=payload.temperature_threshold,
-        check_interval_minutes=payload.check_interval_minutes,
+    alert_config = (
+        await AlertConfigService.create_alert_config_and_schedule_task(
+            location=location,
+            temperature_threshold=payload.temperature_threshold,
+            check_interval_minutes=payload.check_interval_minutes,
+        )
     )
+
     return alert_config
 
 
@@ -107,11 +111,15 @@ async def update_alert_config(
 
     update_data = payload.model_dump(exclude_unset=True)
 
-    for attr, value in update_data.items():
-        setattr(config, attr, value)
-    await config.asave()
+    updated_config = (
+        await AlertConfigService.update_alert_config_and_schedule_task(
+            alert_config=config,
+            temperature_threshold=update_data.get('temperature_threshold'),
+            check_interval_minutes=update_data.get('check_interval_minutes'),
+        )
+    )
 
-    return config
+    return updated_config
 
 
 @alert_config_router.delete('/{id}/', response={204: None, 404: MessageSchema})
@@ -128,7 +136,7 @@ async def delete_alert_config(request, id: int):
     """
     try:
         config = await AlertConfig.objects.aget(id=id)
-        await config.adelete()
+        await AlertConfigService.delete_alert_config_and_schedule_task(config)
         return 204, None
     except AlertConfig.DoesNotExist:
         return 404, MessageSchema(
