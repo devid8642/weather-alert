@@ -1,7 +1,7 @@
 import pytest
 from ninja.testing import TestAsyncClient
 
-from apps.alerts.models import AlertConfig
+from weather_alert.apps.alerts.models import AlertConfig
 
 
 @pytest.mark.asyncio

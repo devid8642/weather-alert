@@ -4,10 +4,10 @@ import pytest
 import pytest_asyncio
 from ninja.testing import TestAsyncClient
 
-from apps.alerts.models import Alert, AlertConfig
-from apps.location.models import Location
-from apps.temperature.models import TemperatureLog
 from weather_alert.api.app import api
+from weather_alert.apps.alerts.models import Alert, AlertConfig
+from weather_alert.apps.location.models import Location
+from weather_alert.apps.temperature.models import TemperatureLog
 
 
 def pytest_generate_tests(metafunc):

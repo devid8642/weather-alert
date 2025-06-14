@@ -1,7 +1,7 @@
 from ninja import Router
 
-from apps.location.models import Location
 from weather_alert.api.schemas import MessageSchema
+from weather_alert.apps.location.models import Location
 
 from .models import Alert, AlertConfig
 from .schemas import (

@@ -1,8 +1,6 @@
 from typing import Optional
 
-from ninja import Field, ModelSchema, Schema
-
-from apps.location.models import Location
+from ninja import ModelSchema, Schema
 
 from .models import Alert, AlertConfig
 

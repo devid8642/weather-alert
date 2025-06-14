@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class LocationConfig(AppConfig):
+class AlertsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.location'
+    name = 'weather_alert.apps.alerts'

@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.location.models import Location
+from weather_alert.apps.location.models import Location
 
 
 class TemperatureLog(models.Model):

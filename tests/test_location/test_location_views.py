@@ -1,7 +1,7 @@
 import pytest
 from ninja.testing import TestAsyncClient
 
-from apps.location.models import Location
+from weather_alert.apps.location.models import Location
 
 
 @pytest.fixture
