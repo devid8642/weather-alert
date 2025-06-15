@@ -204,6 +204,22 @@ curl -X POST http://localhost:8000/api/locations/ \
   }'
 ```
 
+### Criar Configuração de Alerta
+
+```bash
+curl -X POST http://localhost:8000/api/alert-configs/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": 1,
+    "temperature_threshold": 15,
+    "check_interval_minutes": 1
+  }'
+```
+
+Após isso o sistema começará a verificar a temperatura da localização configurada a cada minuto e emitirá alertas se a temperatura ultrapassar o limite definido.
+
+Outras requisições comuns para a API incluem:
+
 ### Listar Localizações
 
 ```bash
@@ -220,18 +236,6 @@ curl -X GET http://localhost:8000/api/locations/1/
 
 ```bash
 curl -X DELETE http://localhost:8000/api/locations/1/
-```
-
-### Criar Configuração de Alerta
-
-```bash
-curl -X POST http://localhost:8000/api/alert-configs/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "location": 1,
-    "temperature_threshold": 15,
-    "check_interval_minutes": 1
-  }'
 ```
 
 ### Listar Configurações de Alerta
