@@ -16,12 +16,11 @@ ENV UV_LINK_MODE=copy
 
 # Instala dependências só quando o lock muda
 COPY pyproject.toml uv.lock /app/
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-install-project
+RUN uv sync --frozen --no-install-project
 
 COPY . /app/
 
-# Faz o sync final já com o projeto copiado
-RUN --mount=type=cache,target=/root/.cache/uv uv sync
+RUN uv sync
 
 RUN chmod +x /app/entrypoint.sh
 
