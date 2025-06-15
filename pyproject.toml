@@ -10,6 +10,7 @@ dependencies = [
     "django-ninja>=1.4.3",
     "httpx[http2]>=0.28.1",
     "loguru>=0.7.3",
+    "psycopg>=3.2.9",
     "python-decouple>=3.8",
     "redis[hiredis]>=6.2.0",
     "stamina>=25.1.0",

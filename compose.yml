@@ -1,6 +1,54 @@
+version: "3.9"
+
 services:
   redis:
     image: redis:8
     container_name: redis
     ports:
       - "6379:6379"
+
+  db:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weather_alert
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: weather_alert
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: .
+    container_name: celery_worker
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    command: celery -A weather_alert worker --loglevel=info
+
+  beat:
+    build: .
+    container_name: celery_beat
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    command: sh -c "sleep 10 && celery -A weather_alert beat --scheduler django_celery_beat.schedulers:DatabaseScheduler --loglevel=info"
+
+volumes:
+  postgres_data:
