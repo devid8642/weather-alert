@@ -34,6 +34,14 @@ O projeto possui as seguintes funcionalidades:
 * `compose.yml` - Orquestração dos serviços Docker (Postgres, Redis, Celery, Beat, Django)
 * `Dockerfile` - Build customizado da aplicação Docker
 
+## Como a Aplicação Funciona
+
+Após o cadastro de uma localidade e da respectiva configuração de alerta, o sistema realiza verificações periódicas da temperatura daquela localidade, seguindo o intervalo de tempo definido.
+
+Sempre que a temperatura atual ultrapassa o limite configurado, um novo alerta é criado e uma notificação é enviada via integração com o N8N. O N8N, ao processar com sucesso a notificação, realiza o callback para a aplicação através de um webhook, marcando o alerta como notificado.
+
+Em ambiente de desenvolvimento, testes ou em situações onde o N8N não está disponível, a aplicação pode ser executada em modo simulado. Nesse modo, as notificações externas são ignoradas e os alertas são automaticamente marcados como notificados, sem realizar chamadas HTTP.
+
 ## Pré-requisitos
 
 * Python 3.12+
