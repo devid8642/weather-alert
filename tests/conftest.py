@@ -2,6 +2,7 @@ import os
 
 import pytest
 import pytest_asyncio
+import stamina
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from ninja.testing import TestAsyncClient
 
@@ -13,6 +14,11 @@ from weather_alert.apps.temperature.models import TemperatureLog
 
 def pytest_generate_tests(metafunc):
     os.environ['NINJA_SKIP_REGISTRY'] = 'yes'
+
+
+@pytest.fixture(autouse=True, scope='session')
+def deactivate_retries():
+    stamina.set_active(False)
 
 
 @pytest.fixture
