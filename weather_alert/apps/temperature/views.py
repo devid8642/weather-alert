@@ -26,7 +26,7 @@ async def list_temperature_logs(
         logger.info(
             f'Listando logs de temperatura para localidade ID {location_id}'
         )
-        queryset = queryset.filter(location_id=location_id)
+        queryset = TemperatureLog.objects.filter(location_id=location_id)
     else:
         logger.info('Listando todos os logs de temperatura')
         queryset = TemperatureLog.objects.all()
