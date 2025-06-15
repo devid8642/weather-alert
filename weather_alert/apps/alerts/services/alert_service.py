@@ -40,6 +40,14 @@ def create_alert_and_notify(
         f'Enviando notificação para N8N webhook (alert_id={alert.id})...'
     )
 
+    if settings.FAKE_WEBHOOK:
+        logger.warning(
+            f'Modo FAKE_WEBHOOK ativo. Simulando notificação para alerta ID {alert.id}'
+        )
+        alert.notified = True
+        alert.save(update_fields=['notified'])
+        return alert
+
     try:
         response = httpx.post(
             settings.N8N_WEBHOOK_URL,
