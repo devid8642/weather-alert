@@ -1,3 +1,4 @@
+from loguru import logger
 from ninja import Query, Router
 
 from weather_alert.api.schemas import MessageSchema
@@ -21,12 +22,17 @@ async def list_temperature_logs(
     Returns:
         list[TemperatureLogSchema]: Lista de registros de temperatura.
     """
-    queryset = TemperatureLog.objects.all()
-
     if location_id is not None:
+        logger.info(
+            f'Listando logs de temperatura para localidade ID {location_id}'
+        )
         queryset = queryset.filter(location_id=location_id)
+    else:
+        logger.info('Listando todos os logs de temperatura')
+        queryset = TemperatureLog.objects.all()
 
     logs = [log async for log in queryset.order_by('-timestamp')]
+    logger.info(f'{len(logs)} registros de temperatura encontrados')
     return logs
 
 
@@ -44,10 +50,14 @@ async def get_temperature_log(request, id: int):
         200: Registro encontrado.
         404: Mensagem de erro caso não seja encontrado.
     """
+    logger.info(f'Buscando registro de temperatura ID {id}')
     try:
         log = await TemperatureLog.objects.aget(id=id)
     except TemperatureLog.DoesNotExist:
+        logger.warning(f'Registro de temperatura ID {id} não encontrado')
         return 404, MessageSchema(
             message='Registro de temperatura não encontrado'
         )
+
+    logger.success(f'Registro de temperatura ID {id} encontrado')
     return log

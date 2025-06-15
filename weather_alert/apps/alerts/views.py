@@ -1,3 +1,4 @@
+from loguru import logger
 from ninja import Router
 
 from weather_alert.api.schemas import MessageSchema
@@ -34,9 +35,15 @@ async def create_alert_config(request, payload: CreateAlertConfigSchema):
         200: Configuração criada com sucesso.
         404: Se a localidade informada não for encontrada.
     """
+    logger.info(
+        f'Criando configuração de alerta para localidade ID {payload.location}'
+    )
     try:
         location = await Location.objects.aget(id=payload.location)
     except Location.DoesNotExist:
+        logger.warning(
+            f'Localidade ID {payload.location} não encontrada ao criar configuração de alerta'
+        )
         return 404, MessageSchema(message='Localidade não encontrada')
 
     alert_config = (
@@ -47,6 +54,9 @@ async def create_alert_config(request, payload: CreateAlertConfigSchema):
         )
     )
 
+    logger.success(
+        f'Configuração de alerta criada para localidade ID {payload.location}'
+    )
     return alert_config
 
 
@@ -58,8 +68,10 @@ async def list_alert_configs(request):
     Returns:
         list[AlertConfigSchema]: Lista de configurações de alerta.
     """
+    logger.info('Listando todas as configurações de alerta')
     queryset = AlertConfig.objects.all()
     alert_configs = [config async for config in queryset]
+    logger.info(f'{len(alert_configs)} configurações de alerta encontradas')
     return alert_configs
 
 
@@ -77,10 +89,13 @@ async def get_alert_config(request, id: int):
         200: Configuração de alerta encontrada.
         404: Se a configuração não existir.
     """
+    logger.info(f'Buscando configuração de alerta ID {id}')
     try:
         config = await AlertConfig.objects.aget(id=id)
+        logger.success(f'Configuração de alerta ID {id} encontrada')
         return config
     except AlertConfig.DoesNotExist:
+        logger.warning(f'Configuração de alerta ID {id} não encontrada.')
         return 404, MessageSchema(
             message='Configuração de alerta não encontrada'
         )
@@ -103,9 +118,13 @@ async def update_alert_config(
         200: Configuração atualizada.
         404: Se a configuração não existir.
     """
+    logger.info(f'Atualizando configuração de alerta ID {id}')
     try:
         config = await AlertConfig.objects.aget(id=id)
     except AlertConfig.DoesNotExist:
+        logger.warning(
+            f'Configuração de alerta ID {id} não encontrada para atualização'
+        )
         return 404, MessageSchema(
             message='Configuração de alerta não encontrada'
         )
@@ -120,6 +139,7 @@ async def update_alert_config(
         )
     )
 
+    logger.success(f'Configuração de alerta ID {id} atualizada com sucesso')
     return updated_config
 
 
@@ -135,11 +155,16 @@ async def delete_alert_config(request, id: int):
         204: Configuração removida.
         404: Se a configuração não existir.
     """
+    logger.info(f'Removendo configuração de alerta ID {id}')
     try:
         config = await AlertConfig.objects.aget(id=id)
         await AlertConfigService.delete_alert_config_and_schedule_task(config)
+        logger.success(f'Configuração de alerta ID {id} removida com sucesso')
         return 204, None
     except AlertConfig.DoesNotExist:
+        logger.warning(
+            f'Configuração de alerta ID {id} não encontrada para remoção'
+        )
         return 404, MessageSchema(
             message='Configuração de alerta não encontrada'
         )
@@ -160,11 +185,14 @@ async def list_alerts(request, location_id: int = None):
         list[AlertSchema]: Lista de alertas.
     """
     if location_id:
+        logger.info(f'Listando alertas para localidade ID {location_id}')
         queryset = Alert.objects.filter(location_id=location_id)
     else:
+        logger.info('Listando todos os alertas')
         queryset = Alert.objects.all()
 
     alerts = [alert async for alert in queryset]
+    logger.info(f'{len(alerts)} alertas encontrados')
     return alerts
 
 
@@ -180,10 +208,13 @@ async def get_alert(request, id: int):
         200: Alerta encontrado.
         404: Se o alerta não existir.
     """
+    logger.info(f'Buscando alerta ID {id}')
     try:
         alert = await Alert.objects.aget(id=id)
+        logger.success(f'Alerta ID {id} encontrado')
         return alert
     except Alert.DoesNotExist:
+        logger.warning(f'Alerta ID {id} não encontrado')
         return 404, MessageSchema(message='Alerta não encontrado')
 
 
@@ -204,12 +235,17 @@ async def mark_alert_as_notified(request, alert_id: int):
         404: Se o alerta não existir.
         401: Se a autenticação falhar
     """
+    logger.info(f'Tentando marcar alerta ID {alert_id} como notificado')
     try:
         alert = await Alert.objects.aget(id=alert_id)
         alert.notified = True
         await alert.asave()
+        logger.success(
+            f'Alerta ID {alert_id} marcado como notificado com sucesso'
+        )
         return 200, MessageSchema(
             message='Alerta marcado como notificado com sucesso'
         )
     except Alert.DoesNotExist:
+        logger.warning(f'Alerta ID {alert_id} não encontrado para notificação')
         return 404, MessageSchema(message='Alerta não encontrado')
