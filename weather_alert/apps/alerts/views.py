@@ -186,14 +186,26 @@ async def list_alerts(request, location_id: int = None):
     """
     if location_id:
         logger.info(f'Listando alertas para localidade ID {location_id}')
-        queryset = Alert.objects.filter(location_id=location_id)
+        queryset = Alert.objects.select_related('location').filter(location_id=location_id)
     else:
         logger.info('Listando todos os alertas')
-        queryset = Alert.objects.all()
+        queryset = Alert.objects.select_related('location').all()
 
     alerts = [alert async for alert in queryset]
     logger.info(f'{len(alerts)} alertas encontrados')
-    return alerts
+
+    return [
+        AlertSchema(
+            id=a.id,
+            location_id=a.location.id,
+            location_name=a.location.name,
+            temperature=a.temperature,
+            threshold=a.threshold,
+            timestamp=a.timestamp,
+            notified=a.notified,
+        )
+        for a in alerts
+    ]
 
 
 @alert_router.get('/{id}/', response={200: AlertSchema, 404: MessageSchema})
@@ -210,9 +222,18 @@ async def get_alert(request, id: int):
     """
     logger.info(f'Buscando alerta ID {id}')
     try:
-        alert = await Alert.objects.aget(id=id)
+        alert = await Alert.objects.select_related('location').aget(id=id)
         logger.success(f'Alerta ID {id} encontrado')
-        return alert
+        return AlertSchema(
+            id=alert.id,
+            location_id=alert.location.id,
+            location_name=alert.location.name,
+            temperature=alert.temperature,
+            threshold=alert.threshold,
+            timestamp=alert.timestamp,
+            notified=alert.notified,
+        )
+
     except Alert.DoesNotExist:
         logger.warning(f'Alerta ID {id} não encontrado')
         return 404, MessageSchema(message='Alerta não encontrado')

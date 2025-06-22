@@ -126,19 +126,28 @@ async def test_list_alerts(api_client: TestAsyncClient, create_alert):
     response = await api_client.get('/alerts/')
     assert response.status_code == 200
     data = response.json()
+    
     assert isinstance(data, list)
     assert any(alert['id'] == create_alert.id for alert in data)
+
+    sample = data[0]
+    assert 'location_id' in sample
+    assert 'location_name' in sample
+    assert 'temperature' in sample
+    assert 'threshold' in sample
+    assert 'timestamp' in sample
+    assert 'notified' in sample
 
 
 @pytest.mark.asyncio
 @pytest.mark.django_db
 async def test_list_alerts_filtered(api_client: TestAsyncClient, create_alert):
-    response = await api_client.get(
-        f'/alerts/?location_id={create_alert.location.id}'
-    )
+    response = await api_client.get(f'/alerts/?location_id={create_alert.location.id}')
     assert response.status_code == 200
     data = response.json()
-    assert all(alert['location'] == create_alert.location.id for alert in data)
+
+    assert all(alert['location_id'] == create_alert.location.id for alert in data)
+    assert any(alert['id'] == create_alert.id for alert in data)
 
 
 @pytest.mark.asyncio

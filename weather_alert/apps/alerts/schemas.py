@@ -2,7 +2,8 @@ from typing import Optional
 
 from ninja import ModelSchema, Schema
 
-from .models import Alert, AlertConfig
+from .models import AlertConfig
+from datetime import datetime
 
 
 class AlertConfigSchema(ModelSchema):
@@ -54,26 +55,24 @@ class UpdateAlertConfigSchema(Schema):
     check_interval_minutes: Optional[int] = None
 
 
-class AlertSchema(ModelSchema):
+
+class AlertSchema(Schema):
     """
-    Schema de saída para alertas.
+    Schema de saída para alerta.
 
     Attributes:
         id (int): Identificador único do alerta.
-        location (Location): Localização associada ao alerta.
+        location_id (int): Identificador da localização associada ao alerta.
+        location_name: str: Nome da localização associada ao alerta.
         temperature (float): Temperatura registrada no momento do alerta.
         threshold (float): Limite de temperatura que disparou o alerta.
         timestamp (datetime): Data e hora em que o alerta foi registrado.
-        notified (bool): Indica se a notificação do alerta foi enviada.
+        notified (bool): Indica se o alerta foi notificado ou não.
     """
-
-    class Meta:
-        model = Alert
-        fields = [
-            'id',
-            'location',
-            'temperature',
-            'threshold',
-            'timestamp',
-            'notified',
-        ]
+    id: int
+    location_id: int
+    location_name: str
+    temperature: float
+    threshold: float
+    timestamp: datetime
+    notified: bool
