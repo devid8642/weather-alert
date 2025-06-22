@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'weather_alert.apps.location',
     'weather_alert.apps.alerts',
     'weather_alert.apps.temperature',
+    'weather_alert.apps.frontend'
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'weather_alert.context_processors.api_base_url'
             ],
         },
     },
@@ -162,3 +164,5 @@ if not FAKE_WEBHOOK:
 else:
     N8N_WEBHOOK_URL = 'https://example.com/webhook'
     N8N_WEBHOOK_HEADER_KEY = 'test-header-key'
+
+API_BASE_URL = config('API_BASE_URL', 'http://127.0.0.1:8000/api')

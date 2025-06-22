@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>{% block title %}Weather Alert{% endblock %}</title>
+    </head>
+    <body
+        class="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10 px-6"
+    >
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Weather Alert</h1>
+            <nav class="flex flex-col space-y-2 mt-4">
+                <a
+                    href="{% url 'index' %}"
+                    class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition"
+                    >Início</a
+                >
+                <a
+                    href="{% url 'locations' %}"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                    >Localizações</a
+                >
+                <a
+                    href="{% url 'alert_configs' %}"
+                    class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                    >Configurar Alertas</a
+                >
+                <a
+                    href="{% url 'alerts' %}"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                    >Alertas</a
+                >
+            </nav>
+        </header>
+
+        <main class="w-full max-w-3xl">{% block content %}{% endblock %}</main>
+    </body>
+</html>

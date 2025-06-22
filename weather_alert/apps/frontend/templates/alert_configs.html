@@ -1,0 +1,117 @@
+{% extends 'base.html' %} {% block title %}Configurações de Alerta |
+Weather Alert{% endblock %} {% block content %}
+<h2 class="text-2xl font-semibold text-gray-800 mb-6">
+    Nova Configuração de Alerta
+</h2>
+
+<form id="alert-config-form" class="flex flex-col gap-4 mb-10">
+    <select name="location" required class="border p-2 rounded">
+        <option value="">Selecione uma localização</option>
+    </select>
+
+    <input
+        type="number"
+        step="any"
+        name="temperature_threshold"
+        placeholder="Limite de Temperatura (°C)"
+        required
+        class="border p-2 rounded"
+    />
+
+    <input
+        type="number"
+        name="check_interval_minutes"
+        placeholder="Intervalo de Verificação (minutos)"
+        required
+        class="border p-2 rounded"
+    />
+
+    <button
+        type="submit"
+        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+    >
+        Criar Configuração
+    </button>
+</form>
+
+<h3 class="text-xl font-semibold text-gray-700 mb-4">Configurações Atuais</h3>
+<ul id="config-list" class="space-y-4"></ul>
+
+<script>
+    const API_BASE = "{{ API_BASE_URL }}";
+
+    async function loadLocations() {
+        const res = await fetch(`${API_BASE}/locations/`);
+        const locations = await res.json();
+        const select = document.querySelector('select[name="location"]');
+        locations.forEach((loc) => {
+            const opt = document.createElement("option");
+            opt.value = loc.id;
+            opt.textContent = loc.name;
+            select.appendChild(opt);
+        });
+    }
+
+    async function loadConfigs() {
+        const res = await fetch(`${API_BASE}/alert-configs/`);
+        const configs = await res.json();
+        const list = document.getElementById("config-list");
+        list.innerHTML = "";
+
+        for (const cfg of configs) {
+            const locRes = await fetch(
+                `${API_BASE}/locations/${cfg.location}/`
+            );
+            const loc = await locRes.json();
+            const item = document.createElement("li");
+            item.className =
+                "flex justify-between items-center bg-white p-4 rounded shadow";
+
+            item.innerHTML = `
+                <div>
+                    <strong>${loc.name}</strong><br>
+                    Temperatura: ${cfg.temperature_threshold}°C<br>
+                    Intervalo: ${cfg.check_interval_minutes} min
+                </div>
+                <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition" onclick="deleteConfig(${cfg.id})">
+                    Deletar
+                </button>
+            `;
+            list.appendChild(item);
+        }
+    }
+
+    async function deleteConfig(id) {
+        await fetch(`${API_BASE}/alert-configs/${id}/`, {
+            method: "DELETE",
+        });
+        loadConfigs();
+    }
+
+    document
+        .getElementById("alert-config-form")
+        .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                location: parseInt(form.location.value),
+                temperature_threshold: parseFloat(
+                    form.temperature_threshold.value
+                ),
+                check_interval_minutes: parseInt(
+                    form.check_interval_minutes.value
+                ),
+            };
+            await fetch(`${API_BASE}/alert-configs/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            form.reset();
+            loadConfigs();
+        });
+
+    loadLocations();
+    loadConfigs();
+</script>
+{% endblock %}
