@@ -159,3 +159,6 @@ FAKE_WEBHOOK = config('FAKE_WEBHOOK', cast=bool, default=False)
 if not FAKE_WEBHOOK:
     N8N_WEBHOOK_URL = config('N8N_WEBHOOK_URL')
     N8N_WEBHOOK_HEADER_KEY = config('N8N_WEBHOOK_HEADER_KEY')
+else:
+    N8N_WEBHOOK_URL = 'https://example.com/webhook'
+    N8N_WEBHOOK_HEADER_KEY = 'test-header-key'
