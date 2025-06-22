@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Localizações | Weather Alert{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-semibold text-gray-800 mb-6">Cadastrar Nova Localização</h2>
+
+<form id="location-form" class="flex flex-col gap-4 mb-10">
+    <input type="text" name="name" placeholder="Nome" required class="border p-2 rounded">
+    <input type="number" step="any" name="latitude" placeholder="Latitude" required class="border p-2 rounded">
+    <input type="number" step="any" name="longitude" placeholder="Longitude" required class="border p-2 rounded">
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        Adicionar Localização
+    </button>
+</form>
+
+<h3 class="text-xl font-semibold text-gray-700 mb-4">Localizações Cadastradas</h3>
+<ul id="locations-list" class="space-y-4"></ul>
+
+<script>
+    const API_BASE = "{{ API_BASE_URL }}";
+
+    async function fetchLocations() {
+        const res = await fetch(`${API_BASE}/locations/`);
+        const locations = await res.json();
+        const list = document.getElementById("locations-list");
+        list.innerHTML = '';
+        locations.forEach(loc => {
+            const item = document.createElement("li");
+            item.className = "flex justify-between items-center bg-white p-4 rounded shadow";
+
+            item.innerHTML = `
+                <div>
+                    <strong>${loc.name}</strong><br>
+                    Latitude: ${loc.latitude} | Longitude: ${loc.longitude}
+                </div>
+                <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition" onclick="deleteLocation(${loc.id})">
+                    Deletar
+                </button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    async function deleteLocation(id) {
+        await fetch(`${API_BASE}/locations/${id}/`, {
+            method: 'DELETE'
+        });
+        fetchLocations();
+    }
+
+    document.getElementById("location-form").addEventListener("submit", async e => {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+            name: form.name.value,
+            latitude: parseFloat(form.latitude.value),
+            longitude: parseFloat(form.longitude.value),
+        };
+        await fetch(`${API_BASE}/locations/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
+        form.reset();
+        fetchLocations();
+    });
+
+    fetchLocations();
+</script>
+{% endblock %}

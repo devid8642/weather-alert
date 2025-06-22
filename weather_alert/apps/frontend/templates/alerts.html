@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Alertas | Weather Alert{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-semibold text-gray-800 mb-6">Alertas</h2>
+
+<ul id="alerts-list" class="space-y-4"></ul>
+
+<script>
+    const API_BASE = "{{ API_BASE_URL }}";
+
+    async function fetchAlerts() {
+        const res = await fetch(`${API_BASE}/alerts/`);
+        const alerts = await res.json();
+        const list = document.getElementById("alerts-list");
+        list.innerHTML = '';
+        alerts.forEach(alert => {
+            const item = document.createElement("li");
+            item.className = "bg-white p-4 rounded shadow";
+            item.innerHTML = `
+                <strong>Localização:</strong> ${alert.location_name}<br>
+                <strong>Temperatura:</strong> ${alert.temperature}°C<br>
+                <strong>Limite:</strong> ${alert.threshold}°C<br>
+                <strong>Notificado:</strong> ${alert.notified ? 'Sim' : 'Não'}
+            `;
+            list.appendChild(item);
+        });
+    }
+
+
+    fetchAlerts();
+</script>
+{% endblock %}
